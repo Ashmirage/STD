@@ -1,0 +1,42 @@
+# STM32 + Keil MDK project
+
+# Keil user/session files (do not affect project source)
+*.uvoptx
+*.uvguix.*
+*.uvgui.*
+*.uvtmp
+
+# Keil build output directories
+**/Objects/
+**/Listings/
+
+# Keil/CMSIS generated RTE target folders
+**/RTE/_Target_*/
+
+# Common firmware build artifacts
+*.axf
+*.elf
+*.hex
+*.bin
+*.map
+*.lnp
+*.dep
+*.crf
+*.d
+*.o
+*.iex
+*.sct
+*.bak
+*.Bak
+
+# Build logs / debug tool output
+*.build_log.htm
+JLinkLog.txt
+JLinkSettings.ini
+
+# Optional local output folder
+/output/
+
+# OS junk files
+Thumbs.db
+.DS_Store
