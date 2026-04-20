@@ -2,7 +2,7 @@
 #include "delay.h"
 #include "lcd.h"
 #include "scheduler.h"
-
+#include "usart.h"
 
 int main(void){
 	GPIO_InitTypeDef gpio_st;

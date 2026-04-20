@@ -337,7 +337,7 @@
             <v6Rtti>0</v6Rtti>
             <VariousControls>
               <MiscControls></MiscControls>
-              <Define>STM32F40_41xxx,USE_STDPERIPH_DRIVER</Define>
+              <Define>STM32F40_41xxx,USE_STDPERIPH_DRIVER,HSE_VALUE=8000000</Define>
               <Undefine></Undefine>
               <IncludePath>..\driver\cmsis;..\driver\lib;..\driver\lib\inc;..\driver\bsp;..\user</IncludePath>
             </VariousControls>
@@ -779,16 +779,6 @@
           <GroupName>driver/bsp</GroupName>
           <Files>
             <File>
-              <FileName>delay.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\driver\bsp\delay.c</FilePath>
-            </File>
-            <File>
-              <FileName>delay.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\driver\bsp\delay.h</FilePath>
-            </File>
-            <File>
               <FileName>sys.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\driver\bsp\sys.c</FilePath>
@@ -797,21 +787,6 @@
               <FileName>sys.h</FileName>
               <FileType>5</FileType>
               <FilePath>..\driver\bsp\sys.h</FilePath>
-            </File>
-            <File>
-              <FileName>FONT.H</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\driver\bsp\FONT.H</FilePath>
-            </File>
-            <File>
-              <FileName>lcd.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\driver\bsp\lcd.c</FilePath>
-            </File>
-            <File>
-              <FileName>lcd.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\driver\bsp\lcd.h</FilePath>
             </File>
             <File>
               <FileName>usart.c</FileName>
@@ -832,6 +807,111 @@
               <FileName>Scheduler.h</FileName>
               <FileType>5</FileType>
               <FilePath>..\driver\bsp\Scheduler.h</FilePath>
+            </File>
+            <File>
+              <FileName>Matrix_keyboard.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\driver\bsp\Matrix_keyboard.c</FilePath>
+            </File>
+            <File>
+              <FileName>Matrix_keyboard.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\driver\bsp\Matrix_keyboard.h</FilePath>
+            </File>
+            <File>
+              <FileName>delay.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\driver\bsp\delay.c</FilePath>
+            </File>
+            <File>
+              <FileName>delay.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\driver\bsp\delay.h</FilePath>
+            </File>
+            <File>
+              <FileName>FONT.H</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\driver\bsp\FONT.H</FilePath>
+            </File>
+            <File>
+              <FileName>lcd.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\driver\bsp\lcd.c</FilePath>
+            </File>
+            <File>
+              <FileName>lcd.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\driver\bsp\lcd.h</FilePath>
+            </File>
+            <File>
+              <FileName>ctiic.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\driver\bsp\ctiic.c</FilePath>
+            </File>
+            <File>
+              <FileName>ctiic.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\driver\bsp\ctiic.h</FilePath>
+            </File>
+            <File>
+              <FileName>ft5206.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\driver\bsp\ft5206.c</FilePath>
+            </File>
+            <File>
+              <FileName>ft5206.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\driver\bsp\ft5206.h</FilePath>
+            </File>
+            <File>
+              <FileName>gt9147.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\driver\bsp\gt9147.c</FilePath>
+            </File>
+            <File>
+              <FileName>gt9147.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\driver\bsp\gt9147.h</FilePath>
+            </File>
+            <File>
+              <FileName>ott2001a.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\driver\bsp\ott2001a.c</FilePath>
+            </File>
+            <File>
+              <FileName>ott2001a.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\driver\bsp\ott2001a.h</FilePath>
+            </File>
+            <File>
+              <FileName>touch.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\driver\bsp\touch.c</FilePath>
+            </File>
+            <File>
+              <FileName>touch.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\driver\bsp\touch.h</FilePath>
+            </File>
+            <File>
+              <FileName>24cxx.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\driver\bsp\24cxx.c</FilePath>
+            </File>
+            <File>
+              <FileName>24cxx.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\driver\bsp\24cxx.h</FilePath>
+            </File>
+            <File>
+              <FileName>myiic.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\driver\bsp\myiic.c</FilePath>
+            </File>
+            <File>
+              <FileName>myiic.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\driver\bsp\myiic.h</FilePath>
             </File>
           </Files>
         </Group>

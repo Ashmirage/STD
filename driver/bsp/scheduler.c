@@ -2,9 +2,10 @@
 #include "delay.h"
 #include "lcd.h"
 #include "usart.h"
+#include  "touch.h"
+#include "Matrix_keyboard.h"
 //#include "led.h"
 //#include "my_usart.h"
-//#include "Matrix_keyboard.h"
 //#include "Relay.h"
 //#include "Buzzer.h"
 //#include "delay_us.h"
@@ -25,6 +26,7 @@
 // 1ms执行一次
 static void Loop_1000hz(void)
 {
+
 //	LED_tick();
 //	APP_data_update(); //信息采集
 //	Stepmotor_Rhythm_1ms(); // 步进电机
@@ -34,6 +36,19 @@ static void Loop_1000hz(void)
 // 20ms执行一次
 static void Loop_50hz(void)
 {
+	uint8_t num = MK_Get();
+	if(num != 0){
+		Send_printf("num=%d\r\n",num);
+	}
+//	if (tp_dev.scan(0))  // 正常扫描，电容屏就这么用
+//    {
+//		Send_printf("touch\r\n");
+////        uint16_t x = tp_dev.x[0];
+////        uint16_t y = tp_dev.y[0];
+////		TP_Draw_Big_Point(x,y,RED);
+////		Send_printf("x=%d,y=%d\r\n",x,y);
+//        // x,y 就是当前第 1 个触点的屏幕坐标
+//    }
 //	APP(20); //APP业务
 //	Buzzer_alarm(20); //蜂鸣器报警
 ////	Send_printf("lux=%d\r\n",light_data);
@@ -42,11 +57,10 @@ static void Loop_50hz(void)
 // 500ms执行一次
 static void Loop_2hz(void)
 {
-	Send_printf("running\r\n");
-//	Send_printf("running~\r\n");
+	
+	Send_printf("running~\r\n");
 }
 
-uint32_t x = 0;
 static void Loop_1hz(void)
 {
 	
@@ -114,7 +128,11 @@ void Hardware_init(void)
 //	My_usart_init(); //串口初始化
 //	Matrix_keyboard_init(); //矩阵键盘初始化
 //	Buzzer_init(); //蜂鸣器初始化
-//	LCD_Init(); //LCD显示屏初始化
+	LCD_Init(); //LCD显示屏初始化
+	TP_Init();
+	MK_Init();
+	LCD_Clear(WHITE);
+	LCD_ShowString(0,0,200,24,24,"123456");
 //	Relay_init(); //继电器初始化
 //	AD_init(); //AD转换初始化
 //	Motor_init();//直流电机初始化
@@ -163,9 +181,6 @@ void Hardware_init(void)
 ////		Send_printf("end=%d\r\n,hum=%d",SysTick_GetTick(),data.humidity);
 ////	}
 }
-
-
-
 
 
 
