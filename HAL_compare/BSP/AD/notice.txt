@@ -1,0 +1,4 @@
+
+
+
+DMA转运需要勾选mode为circular
