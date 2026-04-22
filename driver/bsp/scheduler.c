@@ -6,7 +6,13 @@
 #include "Matrix_keyboard.h"
 #include "servo.h"
 #include "w25qxx.h"
-#include "Pot.h"
+#include "AD.h"
+#include "HCSR04.h"
+#include "DHT11.h"
+extern void io0(void);
+extern void gt(void);
+extern void rt(void);
+extern void bt(void);
 //#include "led.h"
 //#include "my_usart.h"
 #include "Relay.h"
@@ -53,7 +59,13 @@ static void Loop_50hz(void)
 		Send_printf("num=%d\r\n",num);
 		Servo_SetAngle(angle);
 	}
-	Send_printf("pot=%d\r\n",Pot_GetData()) ;
+	/* 比赛调试只看三个原始值/参数，串口直接整数打印。 */
+//	Send_printf("pot=%d temp_raw=%d temp=%dC ldr_raw=%d lux=%d\r\n",
+//	            AD_GetPotRaw(),
+//	            AD_GetTempRaw(),
+//	            AD_GetTempCelsius(),
+//	            AD_GetLdrRaw(),
+//	            AD_GetLdrLux()) ;
 //	if(command != 0){
 //		Send_printf("command=%d\r\n",command);
 //	}
@@ -74,21 +86,28 @@ static void Loop_50hz(void)
 // 500ms执行一次
 static void Loop_2hz(void)
 {
-	
+	gt();
+	rt();
 }
 
 uint8_t status = 0;
+int8_t t,h;
+float distance;
 static void Loop_1hz(void)
 {
-	
-	uint8_t tx[] = "123456";
-    uint8_t rx[sizeof(tx)] = {0};
+//	 bt();
+//	uint8_t tx[] = "123456";
+//    uint8_t rx[sizeof(tx)] = {0};
+//	DHT11_Read(&t,&h);
+//	(void)HCSR04_Read(&distance);
+
 	Relay_status(status);
 	status = 1 - status;
-    W25QXX_Write(tx, 0x000000, sizeof(tx));   // 写到 0 地址
-    W25QXX_Read(rx, 0x000000, sizeof(rx));    // 从 0 地址读回
+	Send_printf("h=%d,distance=%.3f\r\n",h,distance);
+//    W25QXX_Write(tx, 0x000000, sizeof(tx));   // 写到 0 地址
+//    W25QXX_Read(rx, 0x000000, sizeof(rx));    // 从 0 地址读回
 
-    Send_printf("rx = %s\r\n", rx);
+//    Send_printf("rx = %s\r\n", rx);
 //	 speed += dir * 20;
 //	if(speed >= 100){
 //		dir = -dir;
@@ -97,7 +116,6 @@ static void Loop_1hz(void)
 //	}
 //	Motor_set_speed(speed);
 //	Send_printf("speed=%d~\r\n",speed);
-	GPIO_ToggleBits(GPIOF,GPIO_Pin_10);
 //	LED_Toggle();
 //	x++;g
 //	if(x % 2 == 0){
@@ -169,13 +187,15 @@ void Hardware_init(void)
 	LCD_ShowString(0,0,200,24,24,"123456");
 	Motor_init();
 	RTC_clk_init();
+	io0(); // PF8 蜂鸣器，PF9/PF10 LED
 	remote_init(); // 红外遥控初始化
 	Servo_Init(); //舵机初始化
 	W25QXX_Init();
     Send_printf("W25Q ID = 0x%04X\r\n", W25QXX_TYPE);
-	Pot_Init(); //电位器 ADC 初始化，当前用 PA5(STM_ADC)
+	AD_Init(); //AD 初始化
+	HCSR04_Init(); //超声波初始化，当前默认 PE1/PE3 + TIM5
+	DHT11_Init(); //DHT11 初始化，当前默认 PC6
 	Relay_init(); //继电器初始化，默认保持断开
-//	AD_init(); //AD转换初始化
 //	Motor_init();//直流电机初始化
 //	STEPMOTOR_Init(); //步进电机初始化
 //	at24cxx_init(); //FLASH初始化

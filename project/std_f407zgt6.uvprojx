@@ -859,6 +859,41 @@
               <FilePath>..\driver\bsp\Relay.h</FilePath>
             </File>
             <File>
+              <FileName>IO.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\driver\bsp\IO.c</FilePath>
+            </File>
+            <File>
+              <FileName>HCSR04.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\driver\bsp\HCSR04.c</FilePath>
+            </File>
+            <File>
+              <FileName>HCSR04.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\driver\bsp\HCSR04.h</FilePath>
+            </File>
+            <File>
+              <FileName>DHT11.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\driver\bsp\DHT11.c</FilePath>
+            </File>
+            <File>
+              <FileName>DHT11.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\driver\bsp\DHT11.h</FilePath>
+            </File>
+            <File>
+              <FileName>AD.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\driver\bsp\AD.c</FilePath>
+            </File>
+            <File>
+              <FileName>AD.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\driver\bsp\AD.h</FilePath>
+            </File>
+            <File>
               <FileName>Pot.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\driver\bsp\Pot.c</FilePath>

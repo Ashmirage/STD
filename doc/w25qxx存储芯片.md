@@ -21,5 +21,3 @@
   
   Send_printf("rx = %s\r\n", rx);
   ```
-
-  
