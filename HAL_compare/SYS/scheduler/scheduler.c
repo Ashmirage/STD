@@ -62,9 +62,18 @@ static void Loop_50hz(void)
 // 500ms执行一次
 uint8_t mid;
 uint16_t did;
+int16_t speed = 0;
+int8_t dir = 1;
 static void Loop_2hz(void)
 {
-	
+	  speed += dir * 20;
+	if(speed >= 100){
+		dir = -dir;
+	}else if(speed <= -100){
+		dir = -dir;
+	}
+	Motor_set_speed(speed);
+	Send_printf("speed=%d~\r\n",speed);
 //	Send_printf("running~\r\n");
 }
 

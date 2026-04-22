@@ -809,6 +809,66 @@
               <FilePath>..\driver\bsp\Scheduler.h</FilePath>
             </File>
             <File>
+              <FileName>RTC_clk.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\driver\bsp\RTC_clk.c</FilePath>
+            </File>
+            <File>
+              <FileName>RTC_clk.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\driver\bsp\RTC_clk.h</FilePath>
+            </File>
+            <File>
+              <FileName>Motor.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\driver\bsp\Motor.c</FilePath>
+            </File>
+            <File>
+              <FileName>Motor.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\driver\bsp\Motor.h</FilePath>
+            </File>
+            <File>
+              <FileName>remote.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\driver\bsp\remote.c</FilePath>
+            </File>
+            <File>
+              <FileName>remote.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\driver\bsp\remote.h</FilePath>
+            </File>
+            <File>
+              <FileName>Servo.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\driver\bsp\Servo.c</FilePath>
+            </File>
+            <File>
+              <FileName>Servo.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\driver\bsp\Servo.h</FilePath>
+            </File>
+            <File>
+              <FileName>Relay.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\driver\bsp\Relay.c</FilePath>
+            </File>
+            <File>
+              <FileName>Relay.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\driver\bsp\Relay.h</FilePath>
+            </File>
+            <File>
+              <FileName>Pot.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\driver\bsp\Pot.c</FilePath>
+            </File>
+            <File>
+              <FileName>Pot.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\driver\bsp\Pot.h</FilePath>
+            </File>
+            <File>
               <FileName>Matrix_keyboard.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\driver\bsp\Matrix_keyboard.c</FilePath>
@@ -912,6 +972,26 @@
               <FileName>myiic.h</FileName>
               <FileType>5</FileType>
               <FilePath>..\driver\bsp\myiic.h</FilePath>
+            </File>
+            <File>
+              <FileName>w25qxx.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\driver\bsp\w25qxx.c</FilePath>
+            </File>
+            <File>
+              <FileName>w25qxx.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\driver\bsp\w25qxx.h</FilePath>
+            </File>
+            <File>
+              <FileName>spi.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\driver\bsp\spi.c</FilePath>
+            </File>
+            <File>
+              <FileName>spi.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\driver\bsp\spi.h</FilePath>
             </File>
           </Files>
         </Group>

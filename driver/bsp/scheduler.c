@@ -4,23 +4,26 @@
 #include "usart.h"
 #include  "touch.h"
 #include "Matrix_keyboard.h"
+#include "servo.h"
+#include "w25qxx.h"
+#include "Pot.h"
 //#include "led.h"
 //#include "my_usart.h"
-//#include "Relay.h"
+#include "Relay.h"
 //#include "Buzzer.h"
 //#include "delay_us.h"
 //#include "lcd.h"
 //#include "UI.h"
 //#include "lcd_font.h"
-//#include "remote.h"
+#include "remote.h"
 //#include "HW.h"
 //#include "24cxx.h"
 //#include "AD.h"
 //#include "LDR.h"
-//#include "Motor.h"
+#include "Motor.h"
 //#include "stepmotor.h"
 //#include "UI.h"
-//#include "RTC_clk.h"
+#include "RTC_clk.h"
 //#include "syn6288.h"
 //#include "usart.h"
 // 1ms执行一次
@@ -34,12 +37,26 @@ static void Loop_1000hz(void)
 }
 
 // 20ms执行一次
+float angle = 0;
+int8_t dir = 1;
 static void Loop_50hz(void)
 {
 	uint8_t num = MK_Get();
+//	uint8_t command = remote_scan();
 	if(num != 0){
+		angle += dir*90;
+		if(angle >= 180){
+			dir = -dir;
+		}else if(angle <= 0){
+			dir = -dir;
+		}
 		Send_printf("num=%d\r\n",num);
+		Servo_SetAngle(angle);
 	}
+	Send_printf("pot=%d\r\n",Pot_GetData()) ;
+//	if(command != 0){
+//		Send_printf("command=%d\r\n",command);
+//	}
 //	if (tp_dev.scan(0))  // 正常扫描，电容屏就这么用
 //    {
 //		Send_printf("touch\r\n");
@@ -58,19 +75,36 @@ static void Loop_50hz(void)
 static void Loop_2hz(void)
 {
 	
-	Send_printf("running~\r\n");
 }
 
+uint8_t status = 0;
 static void Loop_1hz(void)
 {
 	
+	uint8_t tx[] = "123456";
+    uint8_t rx[sizeof(tx)] = {0};
+	Relay_status(status);
+	status = 1 - status;
+    W25QXX_Write(tx, 0x000000, sizeof(tx));   // 写到 0 地址
+    W25QXX_Read(rx, 0x000000, sizeof(rx));    // 从 0 地址读回
+
+    Send_printf("rx = %s\r\n", rx);
+//	 speed += dir * 20;
+//	if(speed >= 100){
+//		dir = -dir;
+//	}else if(speed <= -100){
+//		dir = -dir;
+//	}
+//	Motor_set_speed(speed);
+//	Send_printf("speed=%d~\r\n",speed);
 	GPIO_ToggleBits(GPIOF,GPIO_Pin_10);
 //	LED_Toggle();
-//	x++;
+//	x++;g
 //	if(x % 2 == 0){
 //		APP_show_info();
 //	}
 //	My_RTC_readtime();
+//	Send_printf("%d-%d-%d %d-%d-%d\r\n",My_RTC_time[0],My_RTC_time[1],My_RTC_time[2],My_RTC_time[3],My_RTC_time[4],My_RTC_time[5]);
 //	DHT11_update_data();//DHT11数据读取,这是阻塞式的,25ms左右
 }
 
@@ -133,7 +167,14 @@ void Hardware_init(void)
 	MK_Init();
 	LCD_Clear(WHITE);
 	LCD_ShowString(0,0,200,24,24,"123456");
-//	Relay_init(); //继电器初始化
+	Motor_init();
+	RTC_clk_init();
+	remote_init(); // 红外遥控初始化
+	Servo_Init(); //舵机初始化
+	W25QXX_Init();
+    Send_printf("W25Q ID = 0x%04X\r\n", W25QXX_TYPE);
+	Pot_Init(); //电位器 ADC 初始化，当前用 PA5(STM_ADC)
+	Relay_init(); //继电器初始化，默认保持断开
 //	AD_init(); //AD转换初始化
 //	Motor_init();//直流电机初始化
 //	STEPMOTOR_Init(); //步进电机初始化
@@ -168,12 +209,7 @@ void Hardware_init(void)
 //	Relay_init(); //继电器初始化
 //	Motor_init();//直流电机初始化
 //	STEPMOTOR_Init(); //步进电机初始化
-//	W25Q128_Init(); //FLASH初始化
-//	RTC_clk_init(); //RTC初始化
-////	W25Q128_SectorErase(PASSWORD_ADDRESS);
-////	W25Q128_PageProgram(PASSWORD_ADDRESS,"123456",7);
 //	APP_init(); //开机动画
-//	
 ////	Send_printf("start=%d\r\n",SysTick_GetTick());
 ////	struct DHT11_data data = DHT11_read_data();
 ////	if(data.status == DHT11_DATA_OK)
@@ -181,7 +217,3 @@ void Hardware_init(void)
 ////		Send_printf("end=%d\r\n,hum=%d",SysTick_GetTick(),data.humidity);
 ////	}
 }
-
-
-
-

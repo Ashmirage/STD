@@ -167,24 +167,6 @@ void Send_byte(uint8_t byte)
 	while(USART_GetFlagStatus(USART1,USART_FLAG_TXE) == RESET);//等待发送寄存器空
 }
 
-/**
- * @brief  串口发送一个数组
- *
- * @param[in]  array 数组指针
-				length 长度
- *
- * @return None
- *
- */
-void Send_array(uint8_t* array,uint16_t length)
-{
-	uint16_t i;
-	for(i = 0;i < length;i++)
-	{	
-		Send_byte(array[i]);
-	}
-}
-
 
 /**
  * @brief  串口发送一个字符串
@@ -201,35 +183,6 @@ void Send_string(char* str)
 	{
 		Send_byte(str[i]);
 		i++;
-	}
-}
-
-/**
-  * 函    数：次方函数（内部使用）
-  * 返 回 值：返回值等于X的Y次方
-  */
-uint32_t Serial_Pow(uint32_t X, uint32_t Y)
-{
-	uint32_t Result = 1;	
-	while (Y --)			
-	{
-		Result *= X;		
-	}
-	return Result;
-}
-
-/**
-  * 函    数：串口发送数字
-  * 参    数：Number 要发送的数字，范围：0~4294967295
-  * 参    数：Length 要发送数字的长度，范围：0~10
-  * 返 回 值：无
-  */
-void Send_number(uint32_t Number, uint8_t Length)
-{
-	uint8_t i;
-	for (i = 0; i < Length; i ++)		
-	{
-		Send_byte(Number / Serial_Pow(10, Length - i - 1) % 10 + '0');	
 	}
 }
 
