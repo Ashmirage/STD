@@ -1,16 +1,13 @@
 #include "delay.h"
 #include "scheduler.h"
 
+
 int main(void){
-	delay_init(168);
-	Scheduler_init();
-	Hardware_init();
+	delay_init(168); // 晶振和延时函数初始化
+	Scheduler_init();                      // 任务调度器初始化
+	Hardware_init();     // 模块初始化
 	while(1){
-		Scheduler_run();
-//		GPIO_WriteBit(GPIOF,GPIO_Pin_10,Bit_RESET);
-//		delay_ms(500);
-//		GPIO_WriteBit(GPIOF,GPIO_Pin_10,Bit_SET);
-//		delay_ms(500);
+		Scheduler_run();    // 任务调度器
 	}
 
 }

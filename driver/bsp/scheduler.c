@@ -1,131 +1,49 @@
 #include "stm32f4xx.h"
-#include "delay.h"
-#include "lcd.h"
-#include "usart.h"
-#include  "touch.h"
-#include "Matrix_keyboard.h"
-#include "servo.h"
-#include "w25qxx.h"
-#include "AD.h"
-#include "HCSR04.h"
-#include "DHT11.h"
-#include "lcd_font.h"
-#include "lcd_hz24.h"
-extern void io0(void);
-extern void gt(void);
-extern void rt(void);
-extern void bt(void);
-//#include "led.h"
-//#include "my_usart.h"
-#include "Relay.h"
-//#include "Buzzer.h"
-//#include "delay_us.h"
-//#include "lcd.h"
-//#include "UI.h"
-//#include "lcd_font.h"
-#include "remote.h"
-//#include "HW.h"
-//#include "24cxx.h"
-//#include "AD.h"
-//#include "LDR.h"
-#include "Motor.h"
-//#include "stepmotor.h"
-//#include "UI.h"
-#include "RTC_clk.h"
-//#include "syn6288.h"
-//#include "usart.h"
+#include "delay.h"  //延时函数
+#include "lcd.h"    //TFT屏幕
+#include "usart.h"  //串口调试
+#include "touch.h"  //触摸功能
+#include "Matrix_keyboard.h" //矩阵键盘
+#include "servo.h" //舵机
+#include "w25qxx.h" //存储芯片
+#include "AD.h"   // 三个ADC采样
+#include "HCSR04.h"  //超声波
+#include "DHT11.h"   //温湿度
+#include "lcd_font.h"  //中文字库
+#include "lcd_hz24.h"  // 显示中文的函数
+#include "UI.h"      // 业务
+#include "Relay.h"   //继电器
+#include "remote.h"  //遥控器
+#include "Motor.h"     //直流电机
+#include "RTC_clk.h"    //实时时钟
+extern void io0(void);//三个IO初始化
+extern void gt(void); // 绿色LED翻转
+extern void rt(void); //红色LED翻转
+extern void bt(void); //蜂鸣器翻转
+
 // 1ms执行一次
 static void Loop_1000hz(void)
 {
-
-//	LED_tick();
 //	APP_data_update(); //信息采集
-//	Stepmotor_Rhythm_1ms(); // 步进电机
-//	LDR_ADC_Read_1ms(); //光敏ADC采样读取
 }
 
 // 20ms执行一次
-float angle = 0;
-int8_t dir = 1;
 static void Loop_50hz(void)
 {
-	uint8_t num = MK_Get();
-//	uint8_t command = remote_scan();
-	if(num != 0){
-		angle += dir*90;
-		if(angle >= 180){
-			dir = -dir;
-		}else if(angle <= 0){
-			dir = -dir;
-		}
-		Send_printf("num=%d\r\n",num);
-		Servo_SetAngle(angle);
-	}
-	/* 比赛调试只看三个原始值/参数，串口直接整数打印。 */
-//	Send_printf("pot=%d temp_raw=%d temp=%dC ldr_raw=%d lux=%d\r\n",
-//	            AD_GetPotRaw(),
-//	            AD_GetTempRaw(),
-//	            AD_GetTempCelsius(),
-//	            AD_GetLdrRaw(),
-//	            AD_GetLdrLux()) ;
-//	if(command != 0){
-//		Send_printf("command=%d\r\n",command);
-//	}
-//	if (tp_dev.scan(0))  // 正常扫描，电容屏就这么用
-//    {
-//		Send_printf("touch\r\n");
-////        uint16_t x = tp_dev.x[0];
-////        uint16_t y = tp_dev.y[0];
-////		TP_Draw_Big_Point(x,y,RED);
-////		Send_printf("x=%d,y=%d\r\n",x,y);
-//        // x,y 就是当前第 1 个触点的屏幕坐标
-//    }
-//	APP(20); //APP业务
-//	Buzzer_alarm(20); //蜂鸣器报警
-////	Send_printf("lux=%d\r\n",light_data);
+
 }
 
 // 500ms执行一次
 static void Loop_2hz(void)
 {
-	gt();
-	rt();
+	gt();  //绿灯翻转
+	rt();  //红灯翻转
 }
 
-uint8_t status = 0;
-int8_t t,h;
-float distance;
+// 1s执行一次
 static void Loop_1hz(void)
 {
-//	 bt();
-//	uint8_t tx[] = "123456";
-//    uint8_t rx[sizeof(tx)] = {0};
-//	DHT11_Read(&t,&h);
-//	(void)HCSR04_Read(&distance);
 
-	Relay_status(status);
-	status = 1 - status;
-	Send_printf("h=%d,distance=%.3f\r\n",h,distance);
-//    W25QXX_Write(tx, 0x000000, sizeof(tx));   // 写到 0 地址
-//    W25QXX_Read(rx, 0x000000, sizeof(rx));    // 从 0 地址读回
-
-//    Send_printf("rx = %s\r\n", rx);
-//	 speed += dir * 20;
-//	if(speed >= 100){
-//		dir = -dir;
-//	}else if(speed <= -100){
-//		dir = -dir;
-//	}
-//	Motor_set_speed(speed);
-//	Send_printf("speed=%d~\r\n",speed);
-//	LED_Toggle();
-//	x++;g
-//	if(x % 2 == 0){
-//		APP_show_info();
-//	}
-//	My_RTC_readtime();
-//	Send_printf("%d-%d-%d %d-%d-%d\r\n",My_RTC_time[0],My_RTC_time[1],My_RTC_time[2],My_RTC_time[3],My_RTC_time[4],My_RTC_time[5]);
-//	DHT11_update_data();//DHT11数据读取,这是阻塞式的,25ms左右
 }
 
 // 定义执行任务的结构体
@@ -178,70 +96,19 @@ void Scheduler_run(void)
 }
 void Hardware_init(void)
 {
-	uart_init(115200);
-//	My_usart_init(); //串口初始化
-//	Matrix_keyboard_init(); //矩阵键盘初始化
-//	Buzzer_init(); //蜂鸣器初始化
-	LCD_Init(); //LCD显示屏初始化
-	TP_Init();
-	MK_Init();
-	LCD_Clear(WHITE);
-	LCD_ShowString(0,0,200,24,24,"123456");
-	Motor_init();
-	RTC_clk_init();
+	uart_init(115200);//串口调试
+	LCD_Init(); //LCD显示屏
+	TP_Init();  //触摸
+	MK_Init();  //矩阵键盘
+	Motor_init(); //直流电机初始化
+	RTC_clk_init();  //实时时钟初始化
 	io0(); // PF8 蜂鸣器，PF9/PF10 LED
 	remote_init(); // 红外遥控初始化
 	Servo_Init(); //舵机初始化
-	W25QXX_Init();
-    Send_printf("W25Q ID = 0x%04X\r\n", W25QXX_TYPE);
+	W25QXX_Init();   //存储芯片初始化
 	AD_Init(); //AD 初始化
 	HCSR04_Init(); //超声波初始化，当前默认 PE1/PE3 + TIM5
 	DHT11_Init(); //DHT11 初始化，当前默认 PC6
 	Relay_init(); //继电器初始化，默认保持断开
-	LCD_ShowHZ24_Dot(0,300,HZ24_NI,1);
-	LCD_ShowHZ24_Dot(24,300,HZ24_HAO,1);
-	LCD_ShowHZ24_Dot(48,300,HZ24_SHI,1);
-	LCD_ShowHZ24_Dot(72,300,HZ24_JIE,1);
-	LCD_ShowHZ24_Dot(96,300,HZ24_HUAN,1);
-	LCD_ShowHZ24_Dot(120,300,HZ24_YING,1);
-//	Motor_init();//直流电机初始化
-//	STEPMOTOR_Init(); //步进电机初始化
-//	at24cxx_init(); //FLASH初始化
-//	APP_init(); //开机动画
-//	My_RTC_settime();
-//	Send_printf("11111");
-	//暂停合成，此时没有用到，用于展示函数用法
-	//YS_SYN_Set(SYN_SuspendCom);
-//	remote_init(); //红外遥控器初始化
-//	CountSensor_Init(); //对射式红外传感器初始化
-//	HW_Init(); //光电红外传感器初始化
-//	at24cxx_init(); //EEPROM初始化
-//	My_RTC_settime(); // rtc实时始终设置时间
-//	Matrix_keyboard_init(); //矩阵键盘初始化
-//	Relay_init(); //继电器初始化
-//	Buzzer_init();  // 蜂鸣器初始化
-//	My_usart_init(115200); //串口初始化
-//	TIM_it_init(); //定时器初始化
-//	Matrix_keyboard_init(); //矩阵键盘初始化
-//	LED_init(); //LED初始化
-//	Buzzer_init(); //蜂鸣器初始化
-//	while (at24cxx_check()) /* 检测不到24c02 */
-//    {
-//        Send_printf("24C02 Check Failed!\r\n");
-//        HAL_Delay(500);
-//    }
-//	Send_printf("check success!\r\n");
-//	HAL_Delay(500);
-//	at24cxx_write(0,write,3);
-//	Lcd_bootup_scrolling(); // 
-//	Relay_init(); //继电器初始化
-//	Motor_init();//直流电机初始化
-//	STEPMOTOR_Init(); //步进电机初始化
-//	APP_init(); //开机动画
-////	Send_printf("start=%d\r\n",SysTick_GetTick());
-////	struct DHT11_data data = DHT11_read_data();
-////	if(data.status == DHT11_DATA_OK)
-////	{
-////		Send_printf("end=%d\r\n,hum=%d",SysTick_GetTick(),data.humidity);
-////	}
+	Lcd_bootup_scrolling();  //滚动字幕);化
 }

@@ -1038,6 +1038,16 @@
               <FileType>5</FileType>
               <FilePath>..\driver\bsp\lcd_hz24.h</FilePath>
             </File>
+            <File>
+              <FileName>UI.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\driver\bsp\UI.h</FilePath>
+            </File>
+            <File>
+              <FileName>UI.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\driver\bsp\UI.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
