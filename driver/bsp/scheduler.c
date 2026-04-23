@@ -9,6 +9,8 @@
 #include "AD.h"
 #include "HCSR04.h"
 #include "DHT11.h"
+#include "lcd_font.h"
+#include "lcd_hz24.h"
 extern void io0(void);
 extern void gt(void);
 extern void rt(void);
@@ -196,6 +198,12 @@ void Hardware_init(void)
 	HCSR04_Init(); //超声波初始化，当前默认 PE1/PE3 + TIM5
 	DHT11_Init(); //DHT11 初始化，当前默认 PC6
 	Relay_init(); //继电器初始化，默认保持断开
+	LCD_ShowHZ24_Dot(0,300,HZ24_NI,1);
+	LCD_ShowHZ24_Dot(24,300,HZ24_HAO,1);
+	LCD_ShowHZ24_Dot(48,300,HZ24_SHI,1);
+	LCD_ShowHZ24_Dot(72,300,HZ24_JIE,1);
+	LCD_ShowHZ24_Dot(96,300,HZ24_HUAN,1);
+	LCD_ShowHZ24_Dot(120,300,HZ24_YING,1);
 //	Motor_init();//直流电机初始化
 //	STEPMOTOR_Init(); //步进电机初始化
 //	at24cxx_init(); //FLASH初始化

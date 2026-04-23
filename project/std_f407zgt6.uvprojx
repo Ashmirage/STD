@@ -1028,6 +1028,16 @@
               <FileType>5</FileType>
               <FilePath>..\driver\bsp\spi.h</FilePath>
             </File>
+            <File>
+              <FileName>lcd_font.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\driver\bsp\lcd_font.h</FilePath>
+            </File>
+            <File>
+              <FileName>lcd_hz24.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\driver\bsp\lcd_hz24.h</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
