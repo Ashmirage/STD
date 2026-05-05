@@ -46,18 +46,19 @@ static void Loop_1hz(void)
 
 }
 
-// 定义执行任务的结构体
+// 调度任务参数
 typedef struct
 {
-	void (*task_func)(void); //任务函数的指针
-	uint32_t task_hz; //任务的执行频率
-	uint16_t interval_ticks; //任务执行的间隔tick数
-	uint32_t last_runtime; //任务上次执行的时间
-}scheduler_task;
+	void (*func)(void); //任务函数
+	uint32_t hz;        //执行频率
+	uint16_t tick;      //执行间隔tick
+	uint32_t last;      //上次执行时间
+}task_t;
 
+#define TASK_N  (sizeof(tasks) / sizeof(tasks[0]))
 
-// 定义所有要执行的任务,一个数组
-scheduler_task task_array[] = {
+// 任务表
+static task_t tasks[] = {
 	{Loop_1000hz,1000,0,0},
 	{Loop_50hz,50,0,0},
 	{Loop_2hz,2,0,0},
@@ -68,12 +69,12 @@ scheduler_task task_array[] = {
 void Scheduler_init(void)
 {
 	uint8_t i;
-	for(i = 0;i < 4;i++)
+	for(i = 0;i < TASK_N;i++)
 	{
-		task_array[i].interval_ticks = (uint16_t)1000 / task_array[i].task_hz; //计算每个任务多少个tick执行一次 T * 1000 = 1000 / f
-		if(task_array[i].interval_ticks < 1) // 如果执行tick间隔小于1,至少应该为1
+		tasks[i].tick = (uint16_t)1000 / tasks[i].hz; //1000 / 频率 = 执行间隔(ms)
+		if(tasks[i].tick < 1) //最快也至少 1ms 执行一次
 		{
-			task_array[i].interval_ticks = 1;
+			tasks[i].tick = 1;
 		}
 	}
 }
@@ -81,16 +82,15 @@ void Scheduler_init(void)
 // 主循环里面不断循环执行这个函数
 void Scheduler_run(void)
 {
-	uint8_t index;
-	uint32_t now_t = SysTick_GetTick(); // 一次读取，所有任务共用
+	uint8_t i;
+	uint32_t now = SysTick_GetTick(); // 一次读取，所有任务共用
 	// 轮询检查不同周期的函数是否需要执行
-	for(index = 0;index < 4;index++)
+	for(i = 0;i < TASK_N;i++)
 	{
-		if((now_t - task_array[index].last_runtime) >= task_array[index].interval_ticks)
+		if((now - tasks[i].last) >= tasks[i].tick)
 		{
-			// 如果当前间隔数>=任务间隔数
-			task_array[index].last_runtime = now_t; //更新该任务上次执行的时间
-			task_array[index].task_func(); // 执行该任务
+			tasks[i].last = now; //更新时间
+			tasks[i].func();     //执行任务
 		}
 	}
 }
