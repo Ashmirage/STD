@@ -4,45 +4,42 @@
 
 - 在delay.c里面新增毫秒时间戳,用于任务调度器:
   ```c
-  // -------- Minimal addition: ms timestamp for scheduler --------
-  static u8 dwt_tick_inited = 0;
-  static u32 dwt_cycles_per_ms = 0;
-  static u32 dwt_last_cycle = 0;
-  static uint64_t dwt_cycle_acc = 0;
+  // 使用 DWT 周期计数器提供调度器需要的 ms 时间戳
+  static u8 ok = 0;
+  static u32 ms = 0;        // 每毫秒对应的 CPU 周期数
+  static u32 last = 0;      // 上一次读取到的 CYCCNT
+  static uint64_t acc = 0;  // 已累计的 CPU 周期数
   
   static void DWT_Init(void)
   {
-      if (dwt_tick_inited)
-      {
-          return;
-      }
+      if (ok) return;
   
+      // 使能 DWT CYCCNT 周期计数器
       CoreDebug->DEMCR |= CoreDebug_DEMCR_TRCENA_Msk;
       DWT->CYCCNT = 0;
       DWT->CTRL |= DWT_CTRL_CYCCNTENA_Msk;
   
-      dwt_last_cycle = DWT->CYCCNT;
-      dwt_cycle_acc = 0;
-      dwt_tick_inited = 1;
+      last = DWT->CYCCNT;
+      acc = 0;
+      ok = 1;
   }
   
   u32 SysTick_GetTick(void)
   {
       u32 now;
-      u32 delta;
+      u32 d;
   
-      if ((dwt_cycles_per_ms == 0) || (dwt_tick_inited == 0))
-      {
-          return 0;
-      }
+      if ((ms == 0) || (ok == 0)) return 0;
   
+      // 累加两次调用之间经过的周期数，再换算成 ms
       now = DWT->CYCCNT;
-      delta = now - dwt_last_cycle;
-      dwt_last_cycle = now;
-      dwt_cycle_acc += delta;
+      d = now - last;
+      last = now;
+      acc += d;
   
-      return (u32)(dwt_cycle_acc / dwt_cycles_per_ms);
+      return (u32)(acc / ms);
   }
+  
   
   void delay_init(u8 SYSCLK)
   {
@@ -64,11 +61,11 @@
       fac_ms = (u16)fac_us * 1000;
   #endif
   
-      dwt_cycles_per_ms = (u32)SYSCLK * 1000U;
-      DWT_Init();
+      ms = (u32)SYSCLK * 1000U;  // SYSCLK 单位是 MHz，MHz * 1000 = cycles/ms
+  	DWT_Init();
   }
   
   
   ```
-
+  
   delay.h里面声明`SysTick_GetTick`
