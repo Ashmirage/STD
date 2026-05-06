@@ -69,3 +69,10 @@
   ```
   
   delay.h里面声明`SysTick_GetTick`
+  
+  `````c
+  // 最后面添加这个声明
+  u32 SysTick_GetTick(void);
+  `````
+  
+  
