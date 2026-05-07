@@ -71,27 +71,6 @@ if (HCSR04_Read(&distance))
 }
 ```
 
-## 3.2 更改引脚/定时器注意事项
-
-- 如果只是改 `TRIG/ECHO` 的 GPIO，优先改 `driver/bsp/HCSR04.h`
-  - `HCSR04_TRIG_PORT`
-  - `HCSR04_TRIG_CLK`
-  - `HCSR04_TRIG_PIN`
-  - `HCSR04_ECHO_PORT`
-  - `HCSR04_ECHO_CLK`
-  - `HCSR04_ECHO_PIN`
-- 如果还是用 `APB1` 上的定时器，比如 `TIM2/TIM3/TIM4/TIM5`，也可以只改：
-  - `HCSR04_TIM`
-  - `HCSR04_TIM_CLK`
-- 但如果你换成 `TIM1/TIM8` 这种 `APB2` 定时器，不能只改宏，因为当前 `HCSR04.c` 里写死的是：
-
-```c
-RCC_APB1PeriphClockCmd(HCSR04_TIM_CLK, ENABLE);
-```
-
-- 这时还要把上面这一句一起改成对应的 `RCC_APB2PeriphClockCmd(...)`
-- 当前代码选 `TIM5` 的一个实际好处是它是 `32bit` 定时器，量程更宽，不容易溢出
-- 很多 `HC-SR04` 的 `ECHO` 是 `5V`，这点不处理好，比代码更容易出问题
 
 ## 4. 完整驱动代码
 
@@ -102,151 +81,157 @@ RCC_APB1PeriphClockCmd(HCSR04_TIM_CLK, ENABLE);
 #define __HCSR04_H
 
 #include <stdint.h>
-#include "stm32f4xx.h"
 
-#ifndef HCSR04_TRIG_PORT
-#define HCSR04_TRIG_PORT GPIOE
-#endif
-
-#ifndef HCSR04_TRIG_CLK
-#define HCSR04_TRIG_CLK RCC_AHB1Periph_GPIOE
-#endif
-
-#ifndef HCSR04_TRIG_PIN
-#define HCSR04_TRIG_PIN GPIO_Pin_1
-#endif
-
-#ifndef HCSR04_ECHO_PORT
-#define HCSR04_ECHO_PORT GPIOE
-#endif
-
-#ifndef HCSR04_ECHO_CLK
-#define HCSR04_ECHO_CLK RCC_AHB1Periph_GPIOE
-#endif
-
-#ifndef HCSR04_ECHO_PIN
-#define HCSR04_ECHO_PIN GPIO_Pin_3
-#endif
-
-#ifndef HCSR04_TIM
-#define HCSR04_TIM TIM5
-#endif
-
-#ifndef HCSR04_TIM_CLK
-#define HCSR04_TIM_CLK RCC_APB1Periph_TIM5
-#endif
-
-#ifndef HCSR04_TIMEOUT_US
-#define HCSR04_TIMEOUT_US 30000
-#endif
-
+/* 初始化超声波模块：默认 PE1=TRIG，PE3=ECHO，TIM5 计时 */
 void HCSR04_Init(void);
+
+/* 读取距离：成功返回 1，失败返回 0，距离单位 cm */
 uint8_t HCSR04_Read(float *cm);
 
 #endif
+
 ```
 
 ### HCSR04.c
 
 ```c
+#include "stm32f4xx.h"
 #include "HCSR04.h"
 #include "delay.h"
 
-#define TIMX HCSR04_TIM
-#define T0() GPIO_ResetBits(HCSR04_TRIG_PORT, HCSR04_TRIG_PIN)
-#define T1() GPIO_SetBits(HCSR04_TRIG_PORT, HCSR04_TRIG_PIN)
-#define E()  (GPIO_ReadInputDataBit(HCSR04_ECHO_PORT, HCSR04_ECHO_PIN) == Bit_SET)
+/* 默认接线：PE1=TRIG，PE3=ECHO，TIM5 计时 */
+#define T_IO      GPIOE
+#define T_CLK     RCC_AHB1Periph_GPIOE
+#define T_PIN     GPIO_Pin_1
 
-static uint8_t x = 0;
+#define E_IO      GPIOE
+#define E_CLK     RCC_AHB1Periph_GPIOE
+#define E_PIN     GPIO_Pin_3
 
-static uint32_t c(void)
+#define TIMX      TIM5
+#define TIM_CLK   RCC_APB1Periph_TIM5
+#define WAIT_US   30000U
+
+/* TRIG 输出和 ECHO 读取 */
+#define T0()      GPIO_ResetBits(T_IO, T_PIN)
+#define T1()      GPIO_SetBits(T_IO, T_PIN)
+#define E()       (GPIO_ReadInputDataBit(E_IO, E_PIN) == Bit_SET)
+
+static uint8_t ok = 0;
+
+/* 获取 TIM5 的真实计数时钟，用来分频成 1MHz */
+static uint32_t tim_clk(void)
 {
-    RCC_ClocksTypeDef r;
-    RCC_GetClocksFreq(&r);
-    return ((RCC->CFGR & RCC_CFGR_PPRE1) == RCC_CFGR_PPRE1_DIV1) ? r.PCLK1_Frequency : (r.PCLK1_Frequency * 2);
+    RCC_ClocksTypeDef rcc;
+
+    RCC_GetClocksFreq(&rcc);
+
+    if ((RCC->CFGR & RCC_CFGR_PPRE1) == RCC_CFGR_PPRE1_DIV1)
+    {
+        return rcc.PCLK1_Frequency;
+    }
+
+    return rcc.PCLK1_Frequency * 2U;
 }
 
-static void i(void)
+/* 初始化 TRIG/ECHO 引脚和 1us 计数定时器 */
+static void init_hw(void)
 {
-    GPIO_InitTypeDef g;
-    TIM_TimeBaseInitTypeDef t;
+    GPIO_InitTypeDef gpio;
+    TIM_TimeBaseInitTypeDef tim;
 
-    RCC_AHB1PeriphClockCmd(HCSR04_TRIG_CLK | HCSR04_ECHO_CLK, ENABLE);
-    RCC_APB1PeriphClockCmd(HCSR04_TIM_CLK, ENABLE);
+    RCC_AHB1PeriphClockCmd(T_CLK | E_CLK, ENABLE);
+    RCC_APB1PeriphClockCmd(TIM_CLK, ENABLE);
 
-    GPIO_StructInit(&g);
-    g.GPIO_Pin = HCSR04_TRIG_PIN;
-    g.GPIO_Mode = GPIO_Mode_OUT;
-    g.GPIO_OType = GPIO_OType_PP;
-    g.GPIO_PuPd = GPIO_PuPd_NOPULL;
-    g.GPIO_Speed = GPIO_Speed_50MHz;
-    GPIO_Init(HCSR04_TRIG_PORT, &g);
+    GPIO_StructInit(&gpio);
+    gpio.GPIO_Pin = T_PIN;
+    gpio.GPIO_Mode = GPIO_Mode_OUT;
+    gpio.GPIO_OType = GPIO_OType_PP;
+    gpio.GPIO_PuPd = GPIO_PuPd_NOPULL;
+    gpio.GPIO_Speed = GPIO_Speed_50MHz;
+    GPIO_Init(T_IO, &gpio);
 
-    g.GPIO_Pin = HCSR04_ECHO_PIN;
-    g.GPIO_Mode = GPIO_Mode_IN;
-    GPIO_Init(HCSR04_ECHO_PORT, &g);
+    gpio.GPIO_Pin = E_PIN;
+    gpio.GPIO_Mode = GPIO_Mode_IN;
+    GPIO_Init(E_IO, &gpio);
 
     T0();
-    TIM_TimeBaseStructInit(&t);
-    t.TIM_Prescaler = (uint16_t)(c() / 1000000 - 1);
-    t.TIM_CounterMode = TIM_CounterMode_Up;
-    t.TIM_Period = 0xFFFFFFFF;
-    t.TIM_ClockDivision = TIM_CKD_DIV1;
-    t.TIM_RepetitionCounter = 0;
-    TIM_TimeBaseInit(TIMX, &t);
+
+    TIM_TimeBaseStructInit(&tim);
+    tim.TIM_Prescaler = (uint16_t)(tim_clk() / 1000000U - 1U);
+    tim.TIM_CounterMode = TIM_CounterMode_Up;
+    tim.TIM_Period = 0xFFFFFFFFU;
+    tim.TIM_ClockDivision = TIM_CKD_DIV1;
+    tim.TIM_RepetitionCounter = 0;
+    TIM_TimeBaseInit(TIMX, &tim);
     TIM_SetCounter(TIMX, 0);
     TIM_Cmd(TIMX, ENABLE);
-    x = 1;
+
+    ok = 1;
 }
 
-static uint8_t w(uint8_t v)
+/* 等待 ECHO 变成指定电平，超过 WAIT_US 就失败 */
+static uint8_t wait_e(uint8_t v)
 {
-    uint32_t s = TIM_GetCounter(TIMX);
+    uint32_t start = TIM_GetCounter(TIMX);
+
     while ((uint8_t)E() != v)
     {
-        if ((uint32_t)(TIM_GetCounter(TIMX) - s) >= HCSR04_TIMEOUT_US)
+        if ((uint32_t)(TIM_GetCounter(TIMX) - start) >= WAIT_US)
         {
             return 0;
         }
     }
+
     return 1;
 }
 
+/* 初始化超声波模块 */
 void HCSR04_Init(void)
 {
-    i();
+    init_hw();
 }
 
+/* 读取距离：成功返回 1，失败返回 0，单位 cm */
 uint8_t HCSR04_Read(float *cm)
 {
-    uint32_t s;
+    uint32_t start;
     if (cm == 0)
     {
         return 0;
     }
-    if (!x)
+
+    if (!ok)
     {
         HCSR04_Init();
     }
-    if (!w(0))
+
+    if (!wait_e(0))
     {
         return 0;
     }
+
     T0();
     delay_us(2);
     T1();
     delay_us(10);
     T0();
-    if (!w(1))
+
+    if (!wait_e(1))
     {
         return 0;
     }
-    s = TIM_GetCounter(TIMX);
-    if (!w(0))
+
+    start = TIM_GetCounter(TIMX);
+
+    if (!wait_e(0))
     {
         return 0;
     }
-    *cm = (float)(TIM_GetCounter(TIMX) - s) * 0.01715f;
+
+    *cm = (float)(TIM_GetCounter(TIMX) - start) * 0.01715f;
+
     return 1;
 }
+
 ```
