@@ -110,5 +110,5 @@ void Hardware_init(void)
 	HCSR04_Init(); //超声波初始化，当前默认 PE1/PE3 + TIM5
 	DHT11_Init(); //DHT11 初始化，当前默认 PC6
 	Relay_init(); //继电器初始化，默认保持断开
-	Lcd_bootup_scrolling();  //滚动字幕);化
+	Lcd_scroll_left_to_right(3000);  //滚动字幕);化
 }
